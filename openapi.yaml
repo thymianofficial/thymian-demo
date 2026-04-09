@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Space Mission Management API
+  title: Space Launch System API
   description: API for managing astronauts and launches
   version: 1.0.0
 servers:
