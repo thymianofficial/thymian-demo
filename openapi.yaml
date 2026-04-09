@@ -1,327 +1,463 @@
-openapi: 3.0.0
+openapi: 3.0.3
+info:
+  title: Space Mission Management API
+  description: API for managing astronauts and launches
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Local development server
 paths:
-  /:
+  /astronauts:
     get:
-      operationId: AppController_getHello
-      parameters: []
-      responses:
-        "200":
-          description: ""
+      summary: List all astronauts
+      operationId: listAstronauts
       tags:
-        - App
-  /users:
-    post:
-      operationId: UsersController_create
-      parameters: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateUserDto"
+        - Astronauts
+      security:
+        - basicAuth: [ ]
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+          description: Maximum number of astronauts to return
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: Number of astronauts to skip
       responses:
-        "201":
-          description: User was created.
+        '200':
+          description: Successful response
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
-      summary: Create new user
-      tags: &a1
-        - users
-    get:
-      operationId: UsersController_findAll
-      parameters: []
-      responses:
-        "200":
-          description: List of users
-      summary: List users
-      tags: *a1
-  /users/{id}:
-    get:
-      operationId: UsersController_findOne
-      parameters:
-        - name: id
-          required: true
-          in: path
-          schema:
-            type: number
-      responses:
-        "200":
-          description: User entity
-      summary: Get user by id
-      tags: *a1
-    patch:
-      operationId: UsersController_update
-      parameters:
-        - name: id
-          required: true
-          in: path
-          schema:
-            type: number
-      responses:
-        "200":
-          description: Updated user
-      summary: Update user
-      tags: *a1
-    delete:
-      operationId: UsersController_remove
-      parameters:
-        - name: id
-          required: true
-          in: path
-          schema:
-            type: number
-      responses:
-        "200":
-          description: User deleted
-      summary: Delete user
-      tags: *a1
-  /todos:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Astronaut'
+        '401':
+          description: Unauthorized
     post:
-      operationId: TodosController_create
-      parameters: []
+      summary: Create a new astronaut
+      operationId: createAstronaut
+      tags:
+        - Astronauts
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateTodoDto"
+              $ref: '#/components/schemas/AstronautInput'
       responses:
-        "201":
-          description: Todo created
-      security: &a2
-        - basic: []
-      summary: Create a new todo (authenticated)
-      tags: &a3
-        - todos
+        '201':
+          description: Astronaut created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Astronaut'
+        '400':
+          description: Invalid input
+        '409':
+          description: Astronaut with this email already exists
+
+  /astronauts/{id}:
     get:
-      operationId: TodosController_findAll
-      parameters: []
-      responses:
-        "200":
-          description: List of todos
-      security: *a2
-      summary: List todos (authenticated)
-      tags: *a3
-  /todos/{id}/participants:
-    post:
-      operationId: TodosController_addParticipants
+      summary: Get an astronaut by ID
+      operationId: getAstronaut
+      tags:
+        - Astronauts
+      security:
+        - basicAuth: [ ]
       parameters:
         - name: id
-          required: true
           in: path
+          required: true
           schema:
-            type: number
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Astronaut'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Astronaut not found
+    put:
+      summary: Update an astronaut
+      description: Astronauts are only allowed to update themselves.
+      operationId: updateAstronaut
+      tags:
+        - Astronauts
+      security:
+        - basicAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/AddParticipantsDto"
+              $ref: '#/components/schemas/AstronautInput'
       responses:
-        "200":
-          description: Participants added
-      security: *a2
-      summary: Add participants to a todo (authenticated)
-      tags: *a3
-  /todos/{id}:
-    get:
-      operationId: TodosController_get
-      parameters:
-        - name: id
-          required: true
-          in: path
-          schema:
-            type: number
-      responses:
-        "200":
-          description: Todo found
-      security: *a2
-      summary: Get a todo with participants and tasks (authenticated)
-      tags: *a3
-    patch:
-      operationId: TodosController_update
-      parameters:
-        - name: id
-          required: true
-          in: path
-          schema:
-            type: number
-      responses:
-        "200":
-          description: Updated todo
-      security: *a2
-      summary: Update a todo (authenticated)
-      tags: *a3
+        '200':
+          description: Astronaut updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Astronaut'
+
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+        '403':
+          description: Unauthorized to update this astronaut
+        '404':
+          description: Astronaut not found
+        '409':
+          description: Astronaut with this email already exists
     delete:
-      operationId: TodosController_remove
+      summary: Delete an astronaut
+      description: Astronauts are only allowed to delete themselves.
+      operationId: deleteAstronaut
+      tags:
+        - Astronauts
+      security:
+        - basicAuth: [ ]
       parameters:
         - name: id
-          required: true
           in: path
+          required: true
           schema:
-            type: number
+            type: integer
       responses:
-        "200":
-          description: Todo deleted
-      security: *a2
-      summary: Delete a todo (authenticated)
-      tags: *a3
-  /todos/{todoId}/tasks:
+        '204':
+          description: Astronaut deleted successfully
+        '401':
+          description: Unauthorized
+        '403':
+          description: Unauthorized to delete this astronaut
+        '404':
+          description: Astronaut not found
+
+  /launches:
+    get:
+      summary: List all launches
+      operationId: listLaunches
+      tags:
+        - Launches
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Launch'
     post:
-      operationId: TasksController_create
-      parameters:
-        - name: todoId
-          required: true
-          in: path
-          schema:
-            type: number
+      summary: Create a new launch
+      description: Only astronauts with the commander role can create launches
+      operationId: createLaunch
+      tags:
+        - Launches
+      security:
+        - basicAuth: [ ]
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateTaskDto"
+              $ref: '#/components/schemas/LaunchInput'
       responses:
-        "201":
-          description: Task erstellt
-      security: &a4
-        - basic: []
-      summary: Task zu einem Todo hinzufügen (authentifiziert)
-      tags: &a5
-        - tasks
+        '201':
+          description: Launch created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Launch'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Unauthorized to create this launch
+        '400':
+          description: Invalid input
+
+  /launches/{id}/crew-members:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
     get:
-      operationId: TasksController_findAll
-      parameters:
-        - name: todoId
-          required: true
-          in: path
-          schema:
-            type: number
+      summary: List all crew members for a launch
+      operationId: listLaunchCrewMembers
+      tags:
+        - Launches
+      security:
+        - basicAuth: [ ]
       responses:
-        "200":
-          description: Liste von Tasks
-      security: *a4
-      summary: Alle Tasks eines Todos auflisten (authentifiziert)
-      tags: *a5
-  /todos/{todoId}/tasks/{id}:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Astronaut'
+        '404':
+          description: Launch not found
+        '401':
+          description: Unauthorized
+          headers:
+            WWW-Authenticate:
+              schema:
+                type: string
+    post:
+      summary: Add a crew member to a launch
+      operationId: addLaunchCrewMember
+      description: Only astronauts with the commander role can add crew members to launches.
+      tags:
+        - Launches
+      security:
+        - basicAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required:
+                - 'astronaut_id'
+              properties:
+                astronaut_id:
+                  type: integer
+      responses:
+        201:
+          description: Successful response
+        400:
+          description: Invalid input
+        401:
+          description: Unauthorized
+        403:
+          description: Unauthorized to add this astronaut to this launch
+        404:
+          description: Launch not found
+        409:
+          description: Astronaut already assigned to this launch
+
+  /launches/{id}:
     get:
-      operationId: TasksController_findOne
+      summary: Get a launch by ID
+      operationId: getLaunch
+      tags:
+        - Launches
+      security:
+        - basicAuth: [ ]
       parameters:
-        - name: todoId
-          required: true
-          in: path
-          schema:
-            type: number
         - name: id
-          required: true
           in: path
+          required: true
           schema:
-            type: number
+            type: integer
       responses:
-        "200":
-          description: Task gefunden
-      security: *a4
-      summary: Einen Task eines Todos abrufen (authentifiziert)
-      tags: *a5
-    patch:
-      operationId: TasksController_update
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Launch'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Launch not found
+    put:
+      summary: Update a launch
+      description: Launches are only allowed to be updated by their creators.
+      operationId: updateLaunch
+      tags:
+        - Launches
+      security:
+        - basicAuth: [ ]
       parameters:
-        - name: todoId
-          required: true
-          in: path
-          schema:
-            type: number
         - name: id
-          required: true
           in: path
+          required: true
           schema:
-            type: number
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LaunchInput'
       responses:
-        "200":
-          description: Task aktualisiert
-      security: *a4
-      summary: Task aktualisieren (authentifiziert)
-      tags: *a5
+        '200':
+          description: Launch updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Launch'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Unauthorized to update this launch'
+        '404':
+          description: Launch not found
+        '400':
+          description: Invalid input
     delete:
-      operationId: TasksController_remove
+      summary: Delete a launch
+      description: Launches are only allowed to be deleted by their creators.
+      operationId: deleteLaunch
+      tags:
+        - Launches
+      security:
+        - basicAuth: [ ]
       parameters:
-        - name: todoId
-          required: true
-          in: path
-          schema:
-            type: number
         - name: id
-          required: true
           in: path
+          required: true
           schema:
-            type: number
+            type: integer
       responses:
-        "200":
-          description: Task gelöscht
-      security: *a4
-      summary: Task löschen (authentifiziert)
-      tags: *a5
-info:
-  title: Todos
-  description: ""
-  version: "1.0"
-  contact: {}
-tags: []
-servers: []
+        '204':
+          description: Launch deleted successfully
+        '401':
+          description: Unauthorized
+        '403':
+          description: Unauthorized to delete this launch
+        '404':
+          description: Launch not found
+
+  /rocket_types:
+    get:
+      summary: List all rocket types
+      operationId: listRocketTypes
+      tags:
+        - RocketTypes
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RocketType'
+
 components:
   schemas:
-    CreateUserDto:
+    Astronaut:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+        role_id:
+          type: integer
+        email:
+          type: string
+      required:
+        - email
+        - id
+        - name
+        - role_id
+
+    AstronautInput:
       type: object
       properties:
         name:
           type: string
-          example: alice
-          description: user name
         password:
           type: string
-          example: secret
-          description: password in plain test
+        email:
+          type: string
+        role:
+          type: string
+          enum:
+            - Commander
+            - Pilot
+            - Specialist
+            - PayloadMaster
       required:
         - name
         - password
-    User:
-      type: object
-      properties: {}
-    CreateTodoDto:
-      type: object
-      properties:
-        title:
-          type: string
-          example: Shopping
-          description: Title of the todo
-        description:
-          type: string
-          example: Milk, Bread, Eggs
-      required:
-        - title
-    AddParticipantsDto:
+        - role
+        - email
+
+    Launch:
       type: object
       properties:
-        userIds:
-          example:
-            - 1
-            - 2
-          description: IDs of users to add to the todo
-          type: array
-          items:
-            type: string
+        id:
+          type: integer
+          readOnly: true
+        mission_name:
+          type: string
+        launch_date:
+          type: string
+          format: date
+        rocket_type_id:
+          type: integer
+        is_manned:
+          type: boolean
+          default: false
+        created_by:
+          $ref: '#/components/schemas/Astronaut'
       required:
-        - userIds
-    CreateTaskDto:
+        - id
+        - mission_name
+        - launch_date
+        - rocket_type_id
+        - is_manned
+        - created_by
+    LaunchInput:
       type: object
       properties:
-        title:
+        mission_name:
           type: string
-          example: Buy milk
-        description:
+        launch_date:
           type: string
-          example: Whole milk 3.5%
+          format: date
+        rocket_type_id:
+          type: integer
+        is_manned:
+          type: boolean
+          default: false
       required:
-        - title
+        - mission_name
+        - launch_date
+        - rocket_type_id
+        - is_manned
+
+    RocketType:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+      required:
+        - id
+        - name
+
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
