@@ -1,0 +1,18 @@
+{
+  "origin": "http://localhost:3000",
+  "path": "/launches",
+  "method": "post",
+  "authorize": false,
+  "headers": {
+    "content-type": "application/json"
+  },
+  "cookies": {},
+  "pathParameters": {},
+  "query": {},
+  "body": {
+    "mission_name": "string",
+    "launch_date": "2019-08-24",
+    "rocket_type_id": 0,
+    "is_manned": false
+  }
+}

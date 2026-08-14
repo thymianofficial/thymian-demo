@@ -1,0 +1,12 @@
+{
+  "origin": "http://localhost:3000",
+  "path": "/launches/{id}",
+  "method": "get",
+  "authorize": true,
+  "headers": {},
+  "cookies": {},
+  "pathParameters": {
+    "id": 0
+  },
+  "query": {}
+}

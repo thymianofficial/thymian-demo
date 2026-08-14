@@ -29,6 +29,28 @@ npm run dev
 
 The server starts on `http://localhost:3000`.
 
+### Running Thymian
+
+On this branch Thymian is already set up. So just follow these steps:
+
+#### 1. Running the dev server
+
+```bash 
+npm run dev
+```
+
+#### 2. Check if every transaction can be executed
+
+```bash 
+npx thymian sampler check
+```
+
+#### 3. Running thymian test
+
+```bash 
+npx thymian test
+```
+
 ### Environment Variables
 
 | Variable      | Default  | Description                                                                                         |

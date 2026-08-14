@@ -1,0 +1,12 @@
+{
+  "origin": "http://localhost:3000",
+  "path": "/astronauts/{id}",
+  "method": "delete",
+  "authorize": true,
+  "headers": {},
+  "cookies": {},
+  "pathParameters": {
+    "id": 0
+  },
+  "query": {}
+}

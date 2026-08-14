@@ -1,0 +1,20 @@
+{
+  "origin": "http://localhost:3000",
+  "path": "/astronauts/{id}",
+  "method": "put",
+  "authorize": false,
+  "headers": {
+    "content-type": "application/json"
+  },
+  "cookies": {},
+  "pathParameters": {
+    "id": 0
+  },
+  "query": {},
+  "body": {
+    "name": "string",
+    "password": "string",
+    "email": "string",
+    "role": "Commander"
+  }
+}

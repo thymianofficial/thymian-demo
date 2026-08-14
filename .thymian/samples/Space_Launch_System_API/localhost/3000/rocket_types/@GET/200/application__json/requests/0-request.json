@@ -1,0 +1,12 @@
+{
+  "origin": "http://localhost:3000",
+  "path": "/rocket_types",
+  "method": "get",
+  "authorize": false,
+  "headers": {
+    "accept": "application/json"
+  },
+  "cookies": {},
+  "pathParameters": {},
+  "query": {}
+}

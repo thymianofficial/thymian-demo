@@ -1,0 +1,14 @@
+{
+  "origin": "http://localhost:3000",
+  "path": "/astronauts/{id}",
+  "method": "get",
+  "authorize": true,
+  "headers": {
+    "accept": "application/json"
+  },
+  "cookies": {},
+  "pathParameters": {
+    "id": 0
+  },
+  "query": {}
+}

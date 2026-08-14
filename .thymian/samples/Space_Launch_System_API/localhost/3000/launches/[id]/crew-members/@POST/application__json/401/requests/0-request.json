@@ -1,0 +1,19 @@
+{
+  "origin": "http://localhost:3000",
+  "path": "/launches/{id}/crew-members",
+  "method": "post",
+  "authorize": false,
+  "headers": {
+    "content-type": "application/json"
+  },
+  "cookies": {},
+  "pathParameters": {
+    "id": 0
+  },
+  "query": {},
+  "body": {
+    "astronaut_id": 0,
+    "property1": null,
+    "property2": null
+  }
+}
