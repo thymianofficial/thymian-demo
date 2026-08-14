@@ -229,11 +229,6 @@ const astronautsPlugin: FastifyPluginAsyncJsonSchemaToTs = async (fastify) => {
       const { id } = request.params;
       const { name, email, password, role } = request.body as any;
 
-      if (request.user?.id !== Number(id)) {
-        reply.code(403);
-        return { error: 'Unauthorized to update this astronaut' };
-      }
-
       const checkStmt = fastify.db.prepare(
         'SELECT id FROM astronaut WHERE id = ?',
       );
@@ -242,6 +237,11 @@ const astronautsPlugin: FastifyPluginAsyncJsonSchemaToTs = async (fastify) => {
       if (!exists) {
         reply.code(404);
         return { error: 'Astronaut not found' };
+      }
+
+      if (request.user?.id !== Number(id)) {
+        reply.code(403);
+        return { error: 'Unauthorized to update this astronaut' };
       }
 
       const roleStmt = fastify.db.prepare<[string], { id: number }>(
