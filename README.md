@@ -2,6 +2,8 @@
 
 An HTTP API managing space missions, astronauts, rocket launches, and crew assignments. Built with Fastify and SQLite, this project serves as a demo application for [Thymian](https://github.com/thymianofficial/thymian) -- an API testing tool.
 
+> Looking for Thymian already set up? Swtich to [this branch](https://github.com/thymianofficial/thymian-demo/tree/thymian-integration).
+
 ## Prerequisites
 
 - Node.js 18 or higher
