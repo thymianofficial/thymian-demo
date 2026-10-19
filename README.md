@@ -53,6 +53,25 @@ npx thymian sampler check
 npx thymian test
 ```
 
+#### How it is set up
+
+Thymian builds a request for every transaction in `openapi.yaml` on each run. The
+hooks under `.thymian/sampler/hooks/` shape those requests so each one reaches the
+status code the description declares:
+
+- `identities.ts` — the seed astronauts the hooks sign in as: Sarah (Commander), Emily
+  (a second Commander) and John (Pilot)
+- `auth.ts` — signs every secured request in as Sarah
+- `astronauts.ts`, `launches.ts` — the data and identities each transaction needs
+
+`.thymian/sampler/generated/` holds the hook types generated from `openapi.yaml`. After
+changing the description, regenerate them and type-check the hooks:
+
+```bash
+npx thymian sampler sync
+npx thymian sampler validate
+```
+
 ### Environment Variables
 
 | Variable      | Default  | Description                                                                                         |

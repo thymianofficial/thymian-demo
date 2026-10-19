@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "target": "es2023",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "types": ["node"],
+    "paths": {
+      "@thymian/hooks": ["./generated/hooks-api.d.ts"]
+    }
+  },
+  "include": ["./hooks/**/*.ts", "./generated/**/*.d.ts"]
+}
