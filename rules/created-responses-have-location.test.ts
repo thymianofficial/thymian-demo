@@ -1,4 +1,11 @@
 import {
+  createCreatedResponse,
+  createGetRequest,
+  createOkResponse,
+  createPostRequest,
+  createRequiredParameter,
+} from '@thymian/core-testing';
+import {
   checkInput,
   inDeclaredContexts,
   type ObservedTransaction,
@@ -8,30 +15,33 @@ import {
 import { describe, expect, it } from 'vitest';
 
 import rule from './created-responses-have-location.rule.js';
-import { described } from './test-support/space-api.js';
 
 // POST /launches -> 201, described and answered without a Location header:
 // what the demo API does today.
 const createdWithoutLocation: ObservedTransaction = {
-  described: described('POST', '/launches', 201, {
-    responseMediaType: 'application/json',
-  }),
+  described: {
+    request: createPostRequest({ path: '/launches' }),
+    response: createCreatedResponse(),
+  },
 };
 
 // The same Transaction as the guideline wants it.
 const createdWithLocation: ObservedTransaction = {
-  described: described('POST', '/launches', 201, {
-    responseMediaType: 'application/json',
-    responseHeaders: ['location'],
-  }),
+  described: {
+    request: createPostRequest({ path: '/launches' }),
+    response: createCreatedResponse({
+      headers: { location: createRequiredParameter() },
+    }),
+  },
   actual: { response: { headers: { location: '/launches/11' } } },
 };
 
 // GET /launches -> 200 has no Location header either, but is not a creation.
 const listedWithoutLocation: ObservedTransaction = {
-  described: described('GET', '/launches', 200, {
-    responseMediaType: 'application/json',
-  }),
+  described: {
+    request: createGetRequest({ path: '/launches' }),
+    response: createOkResponse(),
+  },
 };
 
 describe(rule.meta.name, () => {

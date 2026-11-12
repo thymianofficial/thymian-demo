@@ -99,8 +99,10 @@ rules/
   created-responses-have-location.test.ts
   client-errors-are-problem-json.rule.ts
   client-errors-are-problem-json.test.ts
-  test-support/space-api.ts                  # builds the described Transactions
 ```
+
+The tests build their Transactions with the factories of `@thymian/core-testing`
+(`createPostRequest`, `createCreatedResponse`, ...).
 
 #### Installing an unreleased Thymian
 

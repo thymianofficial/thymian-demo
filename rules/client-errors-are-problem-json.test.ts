@@ -1,4 +1,9 @@
-import { ThymianFormat } from '@thymian/core';
+import {
+  createBadRequestResponse,
+  createCreatedResponse,
+  createPostRequest,
+  createThymianFormatWithTransaction,
+} from '@thymian/core-testing';
 import {
   checkInput,
   inDeclaredContexts,
@@ -9,13 +14,13 @@ import {
 import { describe, expect, it } from 'vitest';
 
 import rule from './client-errors-are-problem-json.rule.js';
-import { described } from './test-support/space-api.js';
 
 // POST /astronauts -> 400 as the demo API has it: plain JSON.
 const plainJsonError: ObservedTransaction = {
-  described: described('POST', '/astronauts', 400, {
-    responseMediaType: 'application/json',
-  }),
+  described: {
+    request: createPostRequest({ path: '/astronauts' }),
+    response: createBadRequestResponse({ mediaType: 'application/json' }),
+  },
   actual: {
     response: { headers: { 'content-type': 'application/json' } },
   },
@@ -23,9 +28,12 @@ const plainJsonError: ObservedTransaction = {
 
 // The same Transaction as Problem Details.
 const problemJsonError: ObservedTransaction = {
-  described: described('POST', '/astronauts', 400, {
-    responseMediaType: 'application/problem+json',
-  }),
+  described: {
+    request: createPostRequest({ path: '/astronauts' }),
+    response: createBadRequestResponse({
+      mediaType: 'application/problem+json',
+    }),
+  },
   actual: {
     response: { headers: { 'content-type': 'application/problem+json' } },
   },
@@ -33,9 +41,10 @@ const problemJsonError: ObservedTransaction = {
 
 // POST /astronauts -> 201: plain JSON, and rightly so.
 const created: ObservedTransaction = {
-  described: described('POST', '/astronauts', 201, {
-    responseMediaType: 'application/json',
-  }),
+  described: {
+    request: createPostRequest({ path: '/astronauts' }),
+    response: createCreatedResponse({ mediaType: 'application/json' }),
+  },
   actual: {
     response: { headers: { 'content-type': 'application/json' } },
   },
@@ -96,22 +105,19 @@ describe(rule.meta.name, () => {
   it('rejects two answers to one Operation in test', async () => {
     await expect(
       runInContext('test', rule, { observed: [created, plainJsonError] }),
-    ).rejects.toThrow();
+    ).rejects.toThrow('give it one row per Operation');
   });
 
   // For comparison, the `violates` input of `test` written with the context's
-  // own fields: a hand-built Thymian Format, and a `runRequest` standing in for
-  // the server. This is the route for a server whose answer depends on the
+  // own fields: a Thymian Format, and a `runRequest` standing in for the
+  // server. This is the route for a server whose answer depends on the
   // request, keeps state, or times out.
   it('flags plain JSON from a hand-written server in test', async () => {
-    const format = new ThymianFormat();
-    const { request, response } = described('POST', '/astronauts', 400, {
-      responseMediaType: 'application/json',
-    });
-    format.addHttpTransaction(request, response, 'space-api-tests');
-
     const results = await runInContext('test', rule, {
-      format,
+      format: createThymianFormatWithTransaction(
+        createPostRequest({ path: '/astronauts' }),
+        createBadRequestResponse({ mediaType: 'application/json' }),
+      ),
       runRequest: async () => ({
         statusCode: 400,
         headers: { 'content-type': 'application/json' },
