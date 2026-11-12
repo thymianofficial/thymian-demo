@@ -20,6 +20,7 @@ traffic: []
 ruleSets:
   - "@thymian/rules-rfc-9110"
   - "@thymian/rules-api-description-validation"
+  - "./rules/index.ts"
 ruleSeverity: hint
 rules: {}
 plugins:

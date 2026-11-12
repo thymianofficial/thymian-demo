@@ -72,6 +72,59 @@ npx thymian sampler sync
 npx thymian sampler validate
 ```
 
+### Custom Rules and Their Tests
+
+`rules/` holds two rules from the Space Launch System's own API guidelines. Both run in
+all three contexts, and the demo API breaks both:
+
+- `space-api/created-responses-have-location`: a `201 Created` response must name the new
+  resource in a `Location` header.
+- `space-api/client-errors-are-problem-json`: a `4xx` response must be
+  `application/problem+json`.
+
+`thymian.config.yaml` loads them through the rule set `rules/index.ts`, so `npx thymian lint`
+and `npx thymian test` report them next to the RFC 9110 rules. Each rule is tested with
+[`@thymian/rules-testing`](https://thymian.dev/guides/http-rules/testing-rules/), which runs
+it through the real linter, tester and analyzer:
+
+```bash
+npm run test:rules        # vitest
+npm run typecheck:rules   # tsc over rules/
+```
+
+```
+rules/
+  index.ts                                   # the rule set: every *.rule.ts next to it
+  created-responses-have-location.rule.ts
+  created-responses-have-location.test.ts
+  client-errors-are-problem-json.rule.ts
+  client-errors-are-problem-json.test.ts
+  test-support/space-api.ts                  # builds the described Transactions
+```
+
+#### Installing an unreleased Thymian
+
+`@thymian/rules-testing` is not released yet. This branch installs Thymian
+`0.4.0-rules-testing.0`, built from the top of the `rules-testing` stack in the
+Thymian repo (branch `mk/707-document-observed-lists`), from a local
+[Verdaccio](https://verdaccio.org) registry. `.npmrc` points npm there. To set it up:
+
+```bash
+# in the thymian repo, on mk/707-document-observed-lists
+npm install
+npm run local-registry                    # keeps running; use a second terminal
+npx nx sync                               # the stack's TypeScript references are out of sync
+npm run local-publish -- --dist-tag latest --version 0.4.0-rules-testing.0
+git checkout -- .                         # the publish versions every package.json
+
+# here
+npm install
+```
+
+The lockfile keeps no registry URLs. If `npm install` fails with `EINTEGRITY`, your
+build of Thymian differs from the one the lockfile recorded: delete `package-lock.json`
+and `node_modules`, and install again.
+
 ### Environment Variables
 
 | Variable      | Default  | Description                                                                                         |
@@ -154,6 +207,7 @@ src/
     astronauts.ts       # Astronaut CRUD routes
     launches.ts         # Launch CRUD + crew management routes
     rocket_types.ts     # Rocket types route
+rules/                  # custom Thymian rules and their tests
 openapi.yaml            # OpenAPI 3.0.3 specification
 ```
 
